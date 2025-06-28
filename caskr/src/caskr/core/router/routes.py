@@ -1,6 +1,5 @@
-from typing import Callable, Dict, Optional, Tuple, Union, Literal, List
-
-from caskr.core.utils.logger import logger
+from http import cookies
+from typing import Callable, Dict, Optional, Tuple, Union, List
 
 _RouteHandler = Union[Callable, Tuple[Callable, Optional[Dict]]]
 
@@ -32,30 +31,50 @@ class _RouteDirectory:
     @property
     def routes(self) -> Dict[str, Callable]:
         return self._routes
-        
-    def get_handler(self, path: str) -> Optional[Tuple[Callable, Optional[Dict], List[str]]]:
+
+    def get_handler(
+        self, path: str
+    ) -> Optional[Tuple[Callable, Optional[Dict], List[str], List[str]]]:
         # Direct match
         if path in self._routes:
             handler = self._routes[path]
-            return (handler, None, self._methods.get(path, []), self._cookies.get(path, []))
+            return (
+                handler,
+                None,
+                self._methods.get(path, []),
+                self._cookies.get(path, []),
+            )
 
         # Pattern match with params
         for pattern, handler in self._routes.items():
             params = parse_route_params(path, pattern)
             if params is not None:
-                return (handler, params, self._methods.get(pattern, []), self._cookies.get(pattern, []))
+                return (
+                    handler,
+                    params,
+                    self._methods.get(pattern, []),
+                    self._cookies.get(pattern, []),
+                )
 
         return None
 
-    def set_handler(self, path: str, handler: _RouteHandler, method, cookies) -> None:
+    def set_handler(
+        self,
+        path: str,
+        handler: _RouteHandler,
+        methods: List[str],
+        cookies: Optional[List[Dict]] = None,
+    ) -> None:
         self._routes[path] = handler
-        self._methods[path] = method
+        self._methods[path] = methods
         self._cookies[path] = cookies or []
 
-    def _normalize_handler(self, handler: _RouteHandler) -> Tuple[Callable, Optional[Dict]]:
+    def _normalize_handler(
+        self, handler: _RouteHandler
+    ) -> Tuple[Callable, Optional[Dict]]:
         if isinstance(handler, tuple):
             return handler
         return handler, None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self._routes)

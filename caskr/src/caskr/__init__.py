@@ -9,6 +9,7 @@ from caskr.core.component import html, p
 from caskr.core.config import CaskrGlobalConf
 from caskr.core.router import Router, route, route_get_handler, route_set_handler
 from caskr.core.router.routes import _RouteDirectory
+from caskr.core.router.router import Response 
 from caskr.core.server.basic_server import BasicServerContext, serve_forever
 from caskr.core.utils.logger import logger, set_log_level, setup_logger
 
@@ -31,7 +32,7 @@ class Caskr(object):
         CaskrGlobalConf.set_route_base_directory(self.route_directory)
     def uptime(self):
         time.time() - self.start_time
-
+    
     def _route_info(self):
         return html(
             "Caskr Server Info",
@@ -77,6 +78,8 @@ __all__ = [
     "set_log_level",
     "logger",
     "BasicServerContext",
+    
+    "Response",
     "Router",
     "route",
     "route_get_handler",

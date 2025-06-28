@@ -1,5 +1,6 @@
 import os 
 import logging
+from caskr.core.cookiejar import CookieJar
 
 # The class `CaskrGlobalConf` contains attributes for default log level, version, and route directory,
 # with a method to set the route base directory.
@@ -9,7 +10,7 @@ class CaskrGlobalConf:
     __version__ = os.environ.get("caskr_version", "0.1.0")
     
     route_dir = None 
-
+    cookie_jar = CookieJar()
 
     @classmethod 
     def set_route_base_directory(cls, route_dir) -> None:
